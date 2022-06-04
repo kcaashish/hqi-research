@@ -9,5 +9,82 @@ s06 <- read.csv("./data/S06_rc_dta-csv copy.csv")
 s09 <- read.csv("./data/S09_rc_dta-csv copy.csv")
 s12 <- read.csv("./data/S12_rc_dta-csv copy.csv")
 
-dependent_vars <- s01 %>% 
-  select(psu, hhld, house_own:type_toilet)
+dependent_vars <- s01 %>%
+  select(psu, hhld, house_own:type_toilet) %>%
+  mutate(
+    house_own = factor(
+      house_own,
+      levels = c("Others", "Institutional", "Rented", "Owned")
+    ),
+    mat_foundation = factor(
+      mat_foundation,
+      levels = c(
+        "Others",
+        "Wooden pillar",
+        "Mud bonded brick/stone",
+        "Cement bonded brick/stone",
+        "RCC with pilar"
+      )
+    ),
+    mat_outerwall = factor(
+      mat_outerwall,
+      levels = c(
+        "Others",
+        "Unbacked brick",
+        "Bamboo",
+        "Wooden plate",
+        "Mud bonded brick/stone",
+        "Cement bonded brick/stone"
+      )
+    ),
+    mat_roof = factor(
+      mat_roof,
+      levels = c(
+        "Others",
+        "Mud",
+        "Thatch",
+        "Wooden plate",
+        "Galvanize sheet",
+        "Tile / slate",
+        "RCC"
+      )
+    ),
+    source_water = factor(
+      source_water,
+      levels = c(
+        "Others",
+        "River / stream",
+        "Spring water",
+        "Uncovered inar / well",
+        "Covered inar / well",
+        "Handpump / Tubewell",
+        "Piped water"
+      )
+    ),
+    source_fuel = factor(
+      source_fuel,
+      levels = c(
+        "Others",
+        "Kerosene",
+        "GUITHA",
+        "Firewood",
+        "Bio gas",
+        "LP Gas",
+        "Electricity"
+      )
+    ),
+    source_light = factor(
+      source_light,
+      levels = c("Others", "Kerosene", "Bio Gas", "Solar", "Electricity")
+    ),
+    type_toilet = factor(
+      type_toilet,
+      levels = c(
+        "No toilet",
+        "Flush toilet (Public sewarage)",
+        "Ordinary",
+        "Community toilet",
+        "Flush toilet (Septik tank)"
+      )
+    )
+  )
