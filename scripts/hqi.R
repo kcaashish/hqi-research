@@ -1,4 +1,5 @@
 library(dplyr)
+library(psych)
 
 # importing the required csv files
 s00 <- read.csv("./data/S00_rc_dta-csv copy.csv")
@@ -88,3 +89,8 @@ dependent_vars <- s01 %>%
       )
     )
   )
+
+# For Cronbach's alpha
+dependent_num <- as_tibble(lapply(dependent_vars, as.numeric))
+alpha_hqi <- dependent_num[-c(1, 2)]
+psych::alpha(alpha_hqi, check.keys = T)
