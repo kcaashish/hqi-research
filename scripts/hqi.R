@@ -1,15 +1,16 @@
 library(dplyr)
 library(psych)
 
-# importing the required csv files
-s00 <- read.csv("./data/S00_rc_dta-csv copy.csv")
-s01 <- read.csv("./data/S01_rc_dta-csv copy.csv")
-s02 <- read.csv("./data/S02_rc_dta-csv copy.csv")
-s04 <- read.csv("./data/S04_rc_dta-csv copy.csv")
-s06 <- read.csv("./data/S06_rc_dta-csv copy.csv")
-s09 <- read.csv("./data/S09_rc_dta-csv copy.csv")
-s12 <- read.csv("./data/S12_rc_dta-csv copy.csv")
+# importing the required csv files ----
+s00 <- read.csv("./data/raw/S00_rc_dta-csv copy.csv")
+s01 <- read.csv("./data/raw/S01_rc_dta-csv copy.csv")
+s02 <- read.csv("./data/raw/S02_rc_dta-csv copy.csv")
+s04 <- read.csv("./data/raw/S04_rc_dta-csv copy.csv")
+s06 <- read.csv("./data/raw/S06_rc_dta-csv copy.csv")
+s09 <- read.csv("./data/raw/S09_rc_dta-csv copy.csv")
+s12 <- read.csv("./data/raw/S12_rc_dta-csv copy.csv")
 
+# dependent vars ----
 dependent_vars <- s01 %>%
   select(psu, hhld, house_own:type_toilet) %>%
   mutate(
@@ -90,7 +91,7 @@ dependent_vars <- s01 %>%
     )
   )
 
-# For Cronbach's alpha
+# For Cronbach's alpha ----
 dependent_num <- as_tibble(lapply(dependent_vars, as.numeric))
 alpha_hqi <- dependent_num[-c(1, 2)]
 psych::alpha(alpha_hqi, check.keys = T)
@@ -100,11 +101,13 @@ psych::alpha(alpha_hqi, check.keys = T)
 dependent_vars_rev <- dependent_vars %>%
   mutate(house_own = factor(house_own, levels = rev(levels(house_own))))
 
-# ----- hqi_num_rev is the final dataset -------
+# ----- final dependent-variable dataset -------
 dep_num_rev <- as_tibble(lapply(dependent_vars_rev, as.numeric))
 
-# Cronbach's alpha calculation for final dataset
+# Cronbach's alpha calculation for final dataset ----
 alpha_hqi_rev <- dep_num_rev[-c(1, 2)]
 out <- psych::alpha(alpha_hqi_rev, check.keys = T)
 capture.output(out, file = "./output/alpha.txt")
 # Raw alpha: 0.66;  Std. alpha: 0.69
+
+
