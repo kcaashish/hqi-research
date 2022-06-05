@@ -94,3 +94,17 @@ dependent_vars <- s01 %>%
 dependent_num <- as_tibble(lapply(dependent_vars, as.numeric))
 alpha_hqi <- dependent_num[-c(1, 2)]
 psych::alpha(alpha_hqi, check.keys = T)
+
+# The function suggested reversing the order of house_own
+# So, reversing the order
+dependent_vars_rev <- dependent_vars %>%
+  mutate(house_own = factor(house_own, levels = rev(levels(house_own))))
+
+# ----- hqi_num_rev is the final dataset -------
+dep_num_rev <- as_tibble(lapply(dependent_vars_rev, as.numeric))
+
+# Cronbach's alpha calculation for final dataset
+alpha_hqi_rev <- dep_num_rev[-c(1, 2)]
+out <- psych::alpha(alpha_hqi_rev, check.keys = T)
+capture.output(out, file = "./output/alpha.txt")
+# Raw alpha: 0.66;  Std. alpha: 0.69
