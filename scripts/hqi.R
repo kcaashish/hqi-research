@@ -1,4 +1,5 @@
 library(dplyr)
+library(ggbiplot)
 library(psych)
 
 # importing the required csv files ----
@@ -112,3 +113,18 @@ capture.output(out, file = "./output/alpha.txt")
 
 # save depended_vars dataframe ----
 saveRDS(dependent_vars_rev, file = "./data/processed/dependent.Rda")
+
+
+# principal component analysis ----
+pca <- prcomp(alpha_hqi_rev, center = TRUE, scale. = TRUE)
+summary(pca)
+ggbiplot(pca, ellipse=TRUE, groups = names(alpha_hqi_rev),
+             obs.scale = 1, circle = TRUE, var.scale = 1, labels.size = 4, varname.size = 3)+
+  theme_bw()+
+  theme(legend.position = "bottom") +
+  theme(legend.text=element_text(size=10)) +
+  guides(colour = guide_legend(nrow = 3)) 
+
+parallel <- fa.parallel(alpha_hqi_rev, fm = "minres", fa = "fa")
+factors <- fa(alpha_hqi_rev, nfactors = 2, rotate = "varimax", fm = "minres")
+print(factors)
