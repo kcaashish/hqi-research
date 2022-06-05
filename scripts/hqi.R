@@ -110,4 +110,5 @@ out <- psych::alpha(alpha_hqi_rev, check.keys = T)
 capture.output(out, file = "./output/alpha.txt")
 # Raw alpha: 0.66;  Std. alpha: 0.69
 
-
+# save depended_vars dataframe ----
+saveRDS(dependent_vars_rev, file = "./data/processed/dependent.Rda")
