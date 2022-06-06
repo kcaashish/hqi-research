@@ -122,3 +122,9 @@ total <- independent_var %>%
   separate(Variables, sep = "-", into = c("Variable", "Stat")) %>% 
   group_by(Variable) %>% 
   pivot_wider(names_from = c("Stat"), names_glue = "Total_{Stat}", values_from = "Val")
+
+# bind regional stats with country-wide stats and count values ----
+grand_total <- left_join(regional, total, by = "Variable")
+options(scipen = 999)
+grand_total_count <- bind_rows(grand_total, count)
+
