@@ -74,3 +74,6 @@ province_data <- province_data %>%
   mutate(
     "HQI Range" = factor(`HQI Range`, levels = c("17-30", "30-33", "33-35", "35-39", "39-45"))
   )
+
+# save hqi_for_sum dataset ----
+saveRDS(hqi_for_sum, file = "./data/processed/hqi_data.RDS")
