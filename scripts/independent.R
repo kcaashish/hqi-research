@@ -70,3 +70,11 @@ independent_var <- raw_independent %>%
 # checking for number of NA values in new dataset ----
 independent_var %>% 
   dplyr::summarise(across(everything(), ~sum(is.na(.))))
+
+# remove rows with NA terms
+independent_var <- independent_var %>% 
+  mutate(
+    can_write = if_else(is.na(can_write) & can_read == 0, 0, can_write),
+    grade_comp = if_else(is.na(grade_comp) & can_read == 0, 0, grade_comp)
+  ) %>%
+  na.omit()
