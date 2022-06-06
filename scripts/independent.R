@@ -100,3 +100,25 @@ regional <- independent_var %>%
   separate(Variables, sep = "-", into = c("Variable", "Stat")) %>% 
   group_by(Variable) %>% 
   pivot_wider(names_from = c("region", "Stat"), names_glue = "{region}_{Stat}", values_from = "Val")
+
+# getting count of the households considered ----
+count <- independent_var %>% 
+  group_by(region) %>% 
+  dplyr::summarise(count = n()) %>% 
+  bind_rows(., tibble(region = "Total", count = nrow(independent_var))) %>% 
+  pivot_wider(names_from = region, names_glue = "{region}_Mean", values_from = count) %>% 
+  mutate(Variable = "Total Count")
+
+# country-wide stats of independent variables ----
+total <- independent_var %>% 
+  dplyr::summarise(across(all_of(vars[vars != "region"]), list(
+    "Mean" = mean,
+    "Sd." = sd,
+    "Min." = min,
+    "Max." = max
+  ), .names = "{.col}-{.fn}")
+  ) %>% 
+  pivot_longer(everything(), names_to = "Variables", values_to = "Val") %>% 
+  separate(Variables, sep = "-", into = c("Variable", "Stat")) %>% 
+  group_by(Variable) %>% 
+  pivot_wider(names_from = c("Stat"), names_glue = "Total_{Stat}", values_from = "Val")
