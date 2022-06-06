@@ -1,5 +1,6 @@
 library(dplyr)
 library(ggbiplot)
+# install_github("vqv/ggbiplot")
 library(psych)
 
 # importing the required csv files ----
@@ -125,7 +126,7 @@ ggbiplot(pca, ellipse=TRUE, groups = names(alpha_hqi_rev),
   theme(legend.text=element_text(size=10)) +
   guides(colour = guide_legend(nrow = 3)) 
 
-parallel <- fa.parallel(alpha_hqi_rev, fm = "minres", fa = "fa")
-factors <- fa(alpha_hqi_rev, nfactors = 2, rotate = "varimax", fm = "minres")
-print(factors)
+# parallel <- fa.parallel(alpha_hqi_rev, fm = "minres", fa = "fa")
+screeplot(pca, type = "line", main = "Scree Plot for PCA")
+fa(alpha_hqi_rev, nfactors = 2, rotate = "varimax", fm = "minres")
 
