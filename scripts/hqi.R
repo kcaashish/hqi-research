@@ -129,12 +129,3 @@ parallel <- fa.parallel(alpha_hqi_rev, fm = "minres", fa = "fa")
 factors <- fa(alpha_hqi_rev, nfactors = 2, rotate = "varimax", fm = "minres")
 print(factors)
 
-# national level stats ----
-print("The national level stats:")
-dep_num_rev %>% 
-  mutate(HQI = rowSums(.[3:10])) %>% 
-  arrange(desc(HQI)) %>%
-  summarise(min = min(HQI),
-            max = max(HQI),
-            mean = mean(HQI),
-            sd = sd(HQI))
