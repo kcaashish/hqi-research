@@ -1,7 +1,7 @@
 library(plotly)
 
 # read the processed data ----
-hqi <- readRDS("./data/processed/dependent.RDS")
+hqi <- readRDS("./data/processed/dependent_vars.RDS")
 
 # function to create Pie charts ----
 make_pie_chart <- function(variable, name, filename) {

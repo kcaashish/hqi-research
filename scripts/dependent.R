@@ -106,10 +106,6 @@ out <- psych::alpha(alpha_hqi_rev, check.keys = T)
 capture.output(out, file = "./output/alpha.txt")
 # Raw alpha: 0.66;  Std. alpha: 0.69
 
-# save depended_vars dataframe ----
-saveRDS(dependent_vars_rev, file = "./data/processed/dependent.Rda")
-
-
 # principal component analysis ----
 pca <- prcomp(alpha_hqi_rev, center = TRUE, scale. = TRUE)
 summary(pca)
@@ -124,3 +120,6 @@ ggbiplot(pca, ellipse=TRUE, groups = names(alpha_hqi_rev),
 screeplot(pca, type = "line", main = "Scree Plot for PCA")
 fa(alpha_hqi_rev, nfactors = 2, rotate = "varimax", fm = "minres")
 
+# save dependent_vars dataframe ----
+saveRDS(dependent_vars_rev, file = "./data/processed/dependent_vars.RDS")
+saveRDS(dep_num_rev, file = "./data/processed/dependent.RDS")
