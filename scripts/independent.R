@@ -1,4 +1,8 @@
 library(dplyr)
+library(tidyr)
+
+# sourcing all the required scripts ----
+source("./scripts/imports.R")
 
 # Collecting all the independent variables ----
 income_s06 <- s06 %>% 
@@ -71,10 +75,28 @@ independent_var <- raw_independent %>%
 independent_var %>% 
   dplyr::summarise(across(everything(), ~sum(is.na(.))))
 
-# remove rows with NA terms
+# remove rows with NA terms ----
 independent_var <- independent_var %>% 
   mutate(
     can_write = if_else(is.na(can_write) & can_read == 0, 0, can_write),
     grade_comp = if_else(is.na(grade_comp) & can_read == 0, 0, grade_comp)
   ) %>%
   na.omit()
+
+# getting region wise stats of independent variables ----
+vars <- names(independent_var)[-c(1, 2)]
+
+regional <- independent_var %>% 
+  group_by(region) %>% 
+  dplyr::summarise(across(all_of(vars[vars != "region"]), list(
+    "Mean" = mean,
+    "Sd." = sd,
+    "Min." = min,
+    "Max." = max
+  ), .names = "{.col}-{.fn}")
+  ) %>% 
+  group_by(region) %>%
+  pivot_longer(!region, names_to = "Variables", values_to = "Val") %>% 
+  separate(Variables, sep = "-", into = c("Variable", "Stat")) %>% 
+  group_by(Variable) %>% 
+  pivot_wider(names_from = c("region", "Stat"), names_glue = "{region}_{Stat}", values_from = "Val")
