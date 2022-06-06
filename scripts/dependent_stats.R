@@ -2,7 +2,7 @@ library(dplyr)
 library(data.table)
 
 # source in the required scripts ----
-source("./scripts/hqi.R")
+source("./scripts/dependent.R")
 
 # national level stats ----
 print("The national level stats:")

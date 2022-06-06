@@ -4,7 +4,7 @@ library(ggpattern)
 # install.packages("magick")
 
 # source in required scripts ----
-source("./scripts/hqi_stats.R")
+source("./scripts/dependent_stats.R")
 
 # Read shapefile into a dataframe, then merge provincial hqi data with the df
 nepal_map <- st_read("./data/hermes_NPL_new_wgs/hermes_NPL_new_wgs_1.shp")
