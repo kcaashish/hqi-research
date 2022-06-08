@@ -156,4 +156,5 @@ total_observation_count <- total_observation %>%
   bind_rows(tibble(Variable = "Total Observations", Total_Mean = nrow(independent_var_with_region)))
 
 # save dataset ----
+saveRDS(independent_var, file = "./data/processed/independent_no_region.RDS")
 saveRDS(independent_var_with_region, file = "./data/processed/independent.RDS")
