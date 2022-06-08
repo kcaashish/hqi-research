@@ -58,9 +58,9 @@ raw_independent %>%
 independent_var <- raw_independent %>% 
   select(!c(tail(names(raw_independent), 4))) %>% 
   mutate(
-    sex = if_else( sex == 1, 1, 0),
-    caste = if_else(caste %in% c(2, 27), 1, 0),
-    marital = if_else(marital == 2, 1, 0),
+    sex = if_else( sex == 1, 1, 0), # male - 1, other - 0
+    caste = if_else(caste %in% c(2, 27), 1, 0), # 
+    # marital = if_else(marital == 2, 1, 0),
     can_read = if_else(can_read == 1, 1, 0),
     can_write = if_else(can_write == 1, 1, 0),
     ever_school = if_else(ever_school == 1, 1, 0),
@@ -154,6 +154,14 @@ total_observation <- independent_var_with_region %>%
 # total observation with count ----
 total_observation_count <- total_observation %>% 
   bind_rows(tibble(Variable = "Total Observations", Total_Mean = nrow(independent_var_with_region)))
+
+# make marital variable a factor with 5 levels ----
+independent_var <- independent_var %>% 
+  mutate(
+    marital = factor(marital,
+                     levels = c(1,2,3,4,5),
+                     labels = c("Never married", "Married", "Widow/widower", "Separated", "Divorced"))
+  )
 
 # save dataset ----
 saveRDS(independent_var, file = "./data/processed/independent_no_region.RDS")
