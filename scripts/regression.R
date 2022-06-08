@@ -3,14 +3,26 @@ library(tidyr)
 
 dependent <- readRDS("./data/processed/dependent.RDS")
 independent <- readRDS("./data/processed/independent.RDS")
+independent_no <- readRDS("./data/processed/independent_no_region.RDS")
 hqi_data <- readRDS("./data/processed/hqi_data.RDS")
 
 # national level equation ----
-all_variables <- left_join(independent,
+all_variables <- left_join(independent_no,
                            hqi_data %>% select(psu, hhld, HQI),
                            by = c("psu", "hhld"))
-national_model <- lm(HQI ~ . - psu - hhld, data = all_variables)
+
+### fit full model ----
+national_model <- lm(HQI ~ sex + age + caste + marital + can_read + can_write + ever_school + 
+                       grade_comp + tec_voc_training + fam_size +
+                       own_land_own + other_land_own + own_land_other + hhg_tot30 +
+                       region, data = all_variables)
 summary(national_model)
+
+### stepwise regression model ----
+national_step <- MASS::stepAIC(national_model, direction = "both", trace = FALSE)
+national_step$anova
+summary(national_step)
+
 
 # himalaya region equation ----
 him_variables <- left_join(
