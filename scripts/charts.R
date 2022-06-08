@@ -7,13 +7,18 @@ hqi <- readRDS("./data/processed/dependent_vars.RDS")
 make_pie_chart <- function(variable, name, filename) {
   pie_df <- as.data.frame(table(variable))
   figure <-
-    plot_ly(pie_df,
-            labels = ~ variable,
-            values = ~ Freq,
-            type = "pie") %>%
+    plot_ly(
+      pie_df,
+      labels = ~ variable,
+      values = ~ Freq,
+      type = "pie"
+    ) %>%
     layout(
-      title = list(text = paste0('<b>', name, '</b>'),
-                   x = 0.5, y = 0.98),
+      title = list(
+        text = paste0('<b>', name, '</b>'),
+        x = 0.5,
+        y = 0.98
+      ),
       xaxis = list(
         showgrid = FALSE,
         zeroline = FALSE,
@@ -24,7 +29,9 @@ make_pie_chart <- function(variable, name, filename) {
         zeroline = FALSE,
         showticklabels = FALSE
       ),
-      legend = list(title = list(text = paste0('<b>', name, '</b>')))
+      legend = list(title = list(text = paste0(
+        '<b>', name, '</b>'
+      )))
     )
   return(figure)
 }

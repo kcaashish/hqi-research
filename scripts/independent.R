@@ -5,8 +5,8 @@ library(tidyr)
 source("./scripts/imports.R")
 
 # Collecting all the independent variables ----
-income_s06 <- s06 %>% 
-  filter(id == 1) %>% 
+income_s06 <- s06 %>%
+  filter(id == 1) %>%
   mutate(
     income_mth = case_when(
       prd_remu == "Monthly" ~ as.numeric(amt_cashrs),
@@ -15,51 +15,66 @@ income_s06 <- s06 %>%
     )
   )
 
-raw_independent <- s02 %>% 
-  filter(id == 1) %>% 
-  dplyr::select(psu, hhld, sex, age, caste, marital, can_read, can_write, ever_school, grade_comp, tec_voc_training) %>%
-  left_join(
-    dplyr::summarise(group_by(s02, psu, hhld), fam_size = n()),
-    by = c("psu", "hhld")
-  ) %>% 
+raw_independent <- s02 %>%
+  filter(id == 1) %>%
+  dplyr::select(
+    psu,
+    hhld,
+    sex,
+    age,
+    caste,
+    marital,
+    can_read,
+    can_write,
+    ever_school,
+    grade_comp,
+    tec_voc_training
+  ) %>%
+  left_join(dplyr::summarise(group_by(s02, psu, hhld), fam_size = n()),
+            by = c("psu", "hhld")) %>%
   # left_join(
   #   dplyr::summarise(group_by(s12, psu, hhld), absent_num = n()),
   #   by = c("psu", "hhld")
-  # ) %>% 
-  # replace_na(list(absent_num = 0)) %>% 
+  # ) %>%
+  # replace_na(list(absent_num = 0)) %>%
   left_join(
     dplyr::select(s00, psu, hhld, region = location_region_HIMALAYAS_HILLS_TERAI),
     by = c("psu", "hhld")
-  ) %>% 
-  mutate(region = factor(region, labels = c("Himalaya", "Hill", "Terai")),) %>%
+  ) %>%
+  mutate(region = factor(region, labels = c("Himalaya", "Hill", "Terai")), ) %>%
   left_join(
     dplyr::select(s01, psu, hhld, own_land_own, other_land_own, own_land_other),
     by = c("psu", "hhld")
   ) %>%
+  left_join(dplyr::select(filter(s09, id == 1), psu, hhld, hhg_tot30),
+            by = c("psu", "hhld")) %>%
   left_join(
-    dplyr::select(filter(s09, id == 1), psu, hhld, hhg_tot30),
+    dplyr::select(
+      filter(s04, id == 1),
+      psu,
+      hhld,
+      occup = mwrk_nsco4,
+      emp_status = mwrk_status,
+      job_sector = mwrk_orgtype
+    ),
     by = c("psu", "hhld")
   ) %>%
-  left_join(
-    dplyr::select(filter(s04, id == 1), psu, hhld, occup = mwrk_nsco4, emp_status = mwrk_status, job_sector = mwrk_orgtype),
-    by = c("psu", "hhld")
-  ) %>%
-  left_join(
-    dplyr::select(filter(income_s06, id == 1), psu, hhld, income_mth),
-    by = c("psu", "hhld")
-  )
+  left_join(dplyr::select(filter(income_s06, id == 1), psu, hhld, income_mth),
+            by = c("psu", "hhld"))
 
 # checking for number of NA values in each variable ----
-raw_independent %>% 
+raw_independent %>%
   # View()
-  dplyr::summarise(across(everything(), ~sum(is.na(.))))
+  dplyr::summarise(across(everything(), ~ sum(is.na(.))))
 
 # dropping the last 4 columns with large number of NAs & creating dummy variables ----
-independent_var <- raw_independent %>% 
-  select(!c(tail(names(raw_independent), 4))) %>% 
+independent_var <- raw_independent %>%
+  select(!c(tail(names(raw_independent), 4))) %>%
   mutate(
-    sex = if_else( sex == 1, 1, 0), # male - 1, other - 0
-    caste = if_else(caste %in% c(2, 27), 1, 0), # 
+    sex = if_else(sex == 1, 1, 0),
+    # male - 1, other - 0
+    caste = if_else(caste %in% c(2, 27), 1, 0),
+    #
     # marital = if_else(marital == 2, 1, 0),
     can_read = if_else(can_read == 1, 1, 0),
     can_write = if_else(can_write == 1, 1, 0),
@@ -72,96 +87,137 @@ independent_var <- raw_independent %>%
   )
 
 # checking for number of NA values in new dataset ----
-independent_var %>% 
-  dplyr::summarise(across(everything(), ~sum(is.na(.))))
+independent_var %>%
+  dplyr::summarise(across(everything(), ~ sum(is.na(.))))
 
 # remove rows with NA terms ----
-independent_var <- independent_var %>% 
+independent_var <- independent_var %>%
   mutate(
     can_write = if_else(is.na(can_write) & can_read == 0, 0, can_write),
-    grade_comp = if_else(is.na(grade_comp) & can_read == 0, 0, grade_comp)
+    grade_comp = if_else(is.na(grade_comp) &
+                           can_read == 0, 0, grade_comp)
   ) %>%
   na.omit()
 
 # getting region wise stats of independent variables ----
 vars <- names(independent_var)[-c(1, 2)]
 
-regional <- independent_var %>% 
-  group_by(region) %>% 
-  dplyr::summarise(across(all_of(vars[vars != "region"]), list(
-    "Mean" = mean,
-    "Sd." = sd,
-    "Min." = min,
-    "Max." = max
-  ), .names = "{.col}-{.fn}")
-  ) %>% 
+regional <- independent_var %>%
   group_by(region) %>%
-  pivot_longer(!region, names_to = "Variables", values_to = "Val") %>% 
-  separate(Variables, sep = "-", into = c("Variable", "Stat")) %>% 
-  group_by(Variable) %>% 
-  pivot_wider(names_from = c("region", "Stat"), names_glue = "{region}_{Stat}", values_from = "Val")
+  dplyr::summarise(across(
+    all_of(vars[vars != "region"]),
+    list(
+      "Mean" = mean,
+      "Sd." = sd,
+      "Min." = min,
+      "Max." = max
+    ),
+    .names = "{.col}-{.fn}"
+  )) %>%
+  group_by(region) %>%
+  pivot_longer(!region, names_to = "Variables", values_to = "Val") %>%
+  separate(Variables,
+           sep = "-",
+           into = c("Variable", "Stat")) %>%
+  group_by(Variable) %>%
+  pivot_wider(
+    names_from = c("region", "Stat"),
+    names_glue = "{region}_{Stat}",
+    values_from = "Val"
+  )
 
 # getting count of the households considered ----
-count <- independent_var %>% 
-  group_by(region) %>% 
-  dplyr::summarise(count = n()) %>% 
-  bind_rows(., tibble(region = "Total", count = nrow(independent_var))) %>% 
-  pivot_wider(names_from = region, names_glue = "{region}_Mean", values_from = count) %>% 
+count <- independent_var %>%
+  group_by(region) %>%
+  dplyr::summarise(count = n()) %>%
+  bind_rows(., tibble(region = "Total", count = nrow(independent_var))) %>%
+  pivot_wider(names_from = region,
+              names_glue = "{region}_Mean",
+              values_from = count) %>%
   mutate(Variable = "Total Count")
 
 # country-wide stats of independent variables ----
-total_no_region <- independent_var %>% 
-  dplyr::summarise(across(all_of(vars[vars != "region"]), list(
-    "Mean" = mean,
-    "Sd." = sd,
-    "Min." = min,
-    "Max." = max
-  ), .names = "{.col}-{.fn}")
-  ) %>% 
-  pivot_longer(everything(), names_to = "Variables", values_to = "Val") %>% 
-  separate(Variables, sep = "-", into = c("Variable", "Stat")) %>% 
-  group_by(Variable) %>% 
-  pivot_wider(names_from = c("Stat"), names_glue = "Total_{Stat}", values_from = "Val")
+total_no_region <- independent_var %>%
+  dplyr::summarise(across(
+    all_of(vars[vars != "region"]),
+    list(
+      "Mean" = mean,
+      "Sd." = sd,
+      "Min." = min,
+      "Max." = max
+    ),
+    .names = "{.col}-{.fn}"
+  )) %>%
+  pivot_longer(everything(), names_to = "Variables", values_to = "Val") %>%
+  separate(Variables,
+           sep = "-",
+           into = c("Variable", "Stat")) %>%
+  group_by(Variable) %>%
+  pivot_wider(
+    names_from = c("Stat"),
+    names_glue = "Total_{Stat}",
+    values_from = "Val"
+  )
 
 # bind regional stats with country-wide stats and count values ----
-grand_total_no_region <- left_join(regional, total_no_region, by = "Variable")
+grand_total_no_region <-
+  left_join(regional, total_no_region, by = "Variable")
 options(scipen = 999)
-grand_total_no_region_count <- bind_rows(grand_total_no_region, count)
+grand_total_no_region_count <-
+  bind_rows(grand_total_no_region, count)
 
 # giving 3 different columns for regions ----
-independent_var_separate_reg <- independent_var %>% 
+independent_var_separate_reg <- independent_var %>%
   mutate(
     himalaya = if_else(region == "Himalaya", 1, 0),
     hill = if_else(region == "Hill", 1, 0),
     terai = if_else(region == "Terai", 1, 0)
-  ) %>% 
+  ) %>%
   select(!c("region"))
 
 # country-wide stats of independent variables including regions ----
-total_observation <- independent_var_separate_reg %>% 
-  dplyr::summarise(across(all_of(names(independent_var_separate_reg)[-c(1:2)]), list(
-    "Mean" = mean,
-    "Sd." = sd,
-    "Min." = min,
-    "Max." = max
-  ), .names = "{.col}-{.fn}")
-  ) %>% 
-  pivot_longer(everything(), names_to = "Variables", values_to = "Val") %>% 
-  separate(Variables, sep = "-", into = c("Variable", "Stat")) %>% 
-  group_by(Variable) %>% 
-  pivot_wider(names_from = c("Stat"), names_glue = "Total_{Stat}", values_from = "Val")
+total_observation <- independent_var_separate_reg %>%
+  dplyr::summarise(across(
+    all_of(names(independent_var_separate_reg)[-c(1:2)]),
+    list(
+      "Mean" = mean,
+      "Sd." = sd,
+      "Min." = min,
+      "Max." = max
+    ),
+    .names = "{.col}-{.fn}"
+  )) %>%
+  pivot_longer(everything(), names_to = "Variables", values_to = "Val") %>%
+  separate(Variables,
+           sep = "-",
+           into = c("Variable", "Stat")) %>%
+  group_by(Variable) %>%
+  pivot_wider(
+    names_from = c("Stat"),
+    names_glue = "Total_{Stat}",
+    values_from = "Val"
+  )
 
 # total observation with count ----
-total_observation_count <- total_observation %>% 
-  bind_rows(tibble(Variable = "Total Observations", Total_Mean = nrow(independent_var_separate_reg)))
+total_observation_count <- total_observation %>%
+  bind_rows(tibble(
+    Variable = "Total Observations",
+    Total_Mean = nrow(independent_var_separate_reg)
+  ))
 
 # make marital variable a factor with 5 levels ----
-independent_var <- independent_var %>% 
-  mutate(
-    marital = factor(marital,
-                     levels = c(1,2,3,4,5),
-                     labels = c("Never married", "Married", "Widow/widower", "Separated", "Divorced"))
-  )
+independent_var <- independent_var %>%
+  mutate(marital = factor(
+    marital,
+    levels = c(1, 2, 3, 4, 5),
+    labels = c(
+      "Never married",
+      "Married",
+      "Widow/widower",
+      "Separated",
+      "Divorced"
+    )
+  ))
 
 # save dataset ----
 saveRDS(independent_var, file = "./data/processed/independent_with_region.RDS")
