@@ -2,12 +2,12 @@ library(dplyr)
 library(tidyr)
 
 dependent <- readRDS("./data/processed/dependent.RDS")
-independent <- readRDS("./data/processed/independent.RDS")
-independent_no <- readRDS("./data/processed/independent_no_region.RDS")
+independent_sep_region <- readRDS("./data/processed/independent_sep_region.RDS")
+independent <- readRDS("./data/processed/independent_with_region.RDS")
 hqi_data <- readRDS("./data/processed/hqi_data.RDS")
 
 # national level equation ----
-all_variables <- left_join(independent_no,
+all_variables <- left_join(independent,
                            hqi_data %>% select(psu, hhld, HQI),
                            by = c("psu", "hhld"))
 
@@ -26,7 +26,7 @@ summary(national_model_f)
 
 # himalaya region equation ----
 him_variables <- left_join(
-  independent_no %>% filter(region == "Himalaya") %>% select(-region),
+  independent %>% filter(region == "Himalaya") %>% select(-region),
   hqi_data %>% select(psu, hhld, HQI),
   by = c("psu", "hhld")
 )
@@ -45,7 +45,7 @@ summary(himalaya_model_f)
 
 # hill region equation ----
 hill_variables <- left_join(
-  independent_no %>% filter(region == "Hill") %>% select(-region),
+  independent %>% filter(region == "Hill") %>% select(-region),
   hqi_data %>% select(psu, hhld, HQI),
   by = c("psu", "hhld")
 )
@@ -63,7 +63,7 @@ summary(hill_model_f)
 
 # terai region equation ----
 ter_variables <- left_join(
-  independent_no %>% filter(region == "Terai") %>% select(-region),
+  independent %>% filter(region == "Terai") %>% select(-region),
   hqi_data %>% select(psu, hhld, HQI),
   by = c("psu", "hhld")
 )

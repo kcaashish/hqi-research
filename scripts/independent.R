@@ -129,7 +129,7 @@ options(scipen = 999)
 grand_total_no_region_count <- bind_rows(grand_total_no_region, count)
 
 # giving 3 different columns for regions ----
-independent_var_with_region <- independent_var %>% 
+independent_var_separate_reg <- independent_var %>% 
   mutate(
     himalaya = if_else(region == "Himalaya", 1, 0),
     hill = if_else(region == "Hill", 1, 0),
@@ -138,8 +138,8 @@ independent_var_with_region <- independent_var %>%
   select(!c("region"))
 
 # country-wide stats of independent variables including regions ----
-total_observation <- independent_var_with_region %>% 
-  dplyr::summarise(across(all_of(names(independent_var_with_region)[-c(1:2)]), list(
+total_observation <- independent_var_separate_reg %>% 
+  dplyr::summarise(across(all_of(names(independent_var_separate_reg)[-c(1:2)]), list(
     "Mean" = mean,
     "Sd." = sd,
     "Min." = min,
@@ -153,7 +153,7 @@ total_observation <- independent_var_with_region %>%
 
 # total observation with count ----
 total_observation_count <- total_observation %>% 
-  bind_rows(tibble(Variable = "Total Observations", Total_Mean = nrow(independent_var_with_region)))
+  bind_rows(tibble(Variable = "Total Observations", Total_Mean = nrow(independent_var_separate_reg)))
 
 # make marital variable a factor with 5 levels ----
 independent_var <- independent_var %>% 
@@ -164,5 +164,5 @@ independent_var <- independent_var %>%
   )
 
 # save dataset ----
-saveRDS(independent_var, file = "./data/processed/independent_no_region.RDS")
-saveRDS(independent_var_with_region, file = "./data/processed/independent.RDS")
+saveRDS(independent_var, file = "./data/processed/independent_with_region.RDS")
+saveRDS(independent_var_separate_reg, file = "./data/processed/independent_sep_region.RDS")
