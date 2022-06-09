@@ -29,7 +29,8 @@ ggplot(nepal_map2, aes(label = stringr::str_wrap(PR_NAME, 13))) +
     pattern_fill = "black",
     fill = "white",
     color = "black",
-    pattern_density = 0.4
+    pattern_scale = 1,
+    pattern_key_scale_factor = 1.5
   ) +
   geom_sf_label(
     fun.geometry = sf::st_centroid,
@@ -37,9 +38,10 @@ ggplot(nepal_map2, aes(label = stringr::str_wrap(PR_NAME, 13))) +
     label.padding = unit(0.05, "lines")
   ) +
   labs(title = "Housing quality distribution by province, Nepal, 2018", x = "", y = "") +
-  scale_pattern_type_discrete(choices = gridpattern::names_magick) +
+  scale_pattern_type_discrete(choices = c("hs_cross", "hs_horizontal", "hs_bdiagonal")) +
   theme_bw() +
   theme(
+    legend.key.size = unit(1.5, "cm"),
     panel.background = element_rect(fill = "white", color = NA),
     axis.text = element_blank(),
     axis.ticks = element_blank(),
