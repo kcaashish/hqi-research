@@ -71,18 +71,25 @@ raw_independent %>%
 independent_var <- raw_independent %>%
   select(!c(tail(names(raw_independent), 4))) %>%
   mutate(
+    # male - 1, others - 0
     sex = if_else(sex == 1, 1, 0),
-    # male - 1, other - 0
+    # brahman (hill), brahman(terai) - 1, others - 0 
     caste = if_else(caste %in% c(2, 27), 1, 0),
-    #
-    # marital = if_else(marital == 2, 1, 0),
+    # can_read - 1, no - 0
     can_read = if_else(can_read == 1, 1, 0),
+    # can_write - 1, no - 0
     can_write = if_else(can_write == 1, 1, 0),
+    # ever_school - 1, no - 0
     ever_school = if_else(ever_school == 1, 1, 0),
+    # above 10 - 1, others - 0
     grade_comp = if_else(as.numeric(grade_comp) >= 10, 1, 0),
+    # yes - 1, no - 0
     tec_voc_training = if_else(tec_voc_training == 1, 1, 0),
+    # yes - 1, no - 0
     own_land_own = if_else(own_land_own == 1, 1, 0),
+    # yes - 1, no - 0
     other_land_own = if_else(other_land_own == 1, 1, 0),
+    # yes - 1, no - 0
     own_land_other = if_else(own_land_other == 1, 1, 0)
   )
 
