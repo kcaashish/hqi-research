@@ -2,11 +2,7 @@ library(dplyr)
 library(tidyr)
 # WARNING: loading MASS library conflicts with select from dplyr
 
-dependent <- readRDS("./data/processed/dependent.RDS")
-independent_sep_region <-
-  readRDS("./data/processed/independent_sep_region.RDS")
-independent <-
-  readRDS("./data/processed/independent_with_region.RDS")
+independent <- readRDS("./data/processed/independent.RDS")
 hqi_data <- readRDS("./data/processed/hqi_data.RDS")
 
 # national level equation ----

@@ -106,112 +106,6 @@ independent_var <- independent_var %>%
   ) %>%
   na.omit()
 
-# getting region wise stats of independent variables ----
-vars <- names(independent_var)[-c(1, 2)]
-
-regional <- independent_var %>%
-  group_by(region) %>%
-  dplyr::summarise(across(
-    all_of(vars[vars != "region"]),
-    list(
-      "Mean" = mean,
-      "Sd." = sd,
-      "Min." = min,
-      "Max." = max
-    ),
-    .names = "{.col}-{.fn}"
-  )) %>%
-  group_by(region) %>%
-  pivot_longer(!region, names_to = "Variables", values_to = "Val") %>%
-  separate(Variables,
-           sep = "-",
-           into = c("Variable", "Stat")) %>%
-  group_by(Variable) %>%
-  pivot_wider(
-    names_from = c("region", "Stat"),
-    names_glue = "{region}_{Stat}",
-    values_from = "Val"
-  )
-
-# getting count of the households considered ----
-count <- independent_var %>%
-  group_by(region) %>%
-  dplyr::summarise(count = n()) %>%
-  bind_rows(., tibble(region = "Total", count = nrow(independent_var))) %>%
-  pivot_wider(names_from = region,
-              names_glue = "{region}_Mean",
-              values_from = count) %>%
-  mutate(Variable = "Total Count")
-
-# country-wide stats of independent variables ----
-total_no_region <- independent_var %>%
-  dplyr::summarise(across(
-    all_of(vars[vars != "region"]),
-    list(
-      "Mean" = mean,
-      "Sd." = sd,
-      "Min." = min,
-      "Max." = max
-    ),
-    .names = "{.col}-{.fn}"
-  )) %>%
-  pivot_longer(everything(), names_to = "Variables", values_to = "Val") %>%
-  separate(Variables,
-           sep = "-",
-           into = c("Variable", "Stat")) %>%
-  group_by(Variable) %>%
-  pivot_wider(
-    names_from = c("Stat"),
-    names_glue = "Total_{Stat}",
-    values_from = "Val"
-  )
-
-# bind regional stats with country-wide stats and count values ----
-grand_total_no_region <-
-  left_join(regional, total_no_region, by = "Variable")
-options(scipen = 999)
-grand_total_no_region_count <-
-  bind_rows(grand_total_no_region, count)
-
-# giving 3 different columns for regions ----
-independent_var_separate_reg <- independent_var %>%
-  mutate(
-    himalaya = if_else(region == "Himalaya", 1, 0),
-    hill = if_else(region == "Hill", 1, 0),
-    terai = if_else(region == "Terai", 1, 0)
-  ) %>%
-  select(!c("region"))
-
-# country-wide stats of independent variables including regions ----
-total_observation <- independent_var_separate_reg %>%
-  dplyr::summarise(across(
-    all_of(names(independent_var_separate_reg)[-c(1:2)]),
-    list(
-      "Mean" = mean,
-      "Sd." = sd,
-      "Min." = min,
-      "Max." = max
-    ),
-    .names = "{.col}-{.fn}"
-  )) %>%
-  pivot_longer(everything(), names_to = "Variables", values_to = "Val") %>%
-  separate(Variables,
-           sep = "-",
-           into = c("Variable", "Stat")) %>%
-  group_by(Variable) %>%
-  pivot_wider(
-    names_from = c("Stat"),
-    names_glue = "Total_{Stat}",
-    values_from = "Val"
-  )
-
-# total observation with count ----
-total_observation_count <- total_observation %>%
-  bind_rows(tibble(
-    Variable = "Total Observations",
-    Total_Mean = nrow(independent_var_separate_reg)
-  ))
-
 # make marital variable a factor with 5 levels ----
 independent_var <- independent_var %>%
   mutate(marital = factor(
@@ -227,5 +121,4 @@ independent_var <- independent_var %>%
   ))
 
 # save dataset ----
-saveRDS(independent_var, file = "./data/processed/independent_with_region.RDS")
-saveRDS(independent_var_separate_reg, file = "./data/processed/independent_sep_region.RDS")
+saveRDS(independent_var, file = "./data/processed/independent.RDS")
