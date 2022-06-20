@@ -1,6 +1,8 @@
 library(dplyr)
 library(tidyr)
 library(labelled)
+library(ggbiplot)
+library(psych)
 
 # source the required scripts ----
 source("./scripts/old/import_old.R")
@@ -35,3 +37,26 @@ dep_old_rev_num <- as_tibble(lapply(dep_old_rev, as.numeric))
 # Cronbach's alpha final ----
 alpha_hqi_rev <- dep_old_rev_num[-c(1, 2)]
 psych::alpha(alpha_hqi_rev, check.keys = T)
+
+# principal component analysis ----
+pca <- prcomp(alpha_hqi_rev, center = TRUE, scale. = TRUE)
+summary(pca)
+
+# biplot ----
+ggbiplot(
+  pca,
+  obs.scale = 1,
+  circle = TRUE,
+  var.scale = 1,
+  varname.size = 4
+)
+
+# screeplot ----
+screeplot(pca, type = "line", main = "Scree Plot for PCA")
+
+# factor analysis ----
+fa(alpha_hqi_rev,
+   nfactors = 2,
+   rotate = "varimax",
+   fm = "minres")
+
