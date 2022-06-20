@@ -9,7 +9,7 @@ source("./scripts/old/import_old.R")
 
 # get the dependent vars ----
 dep_old <- os02 %>% 
-  select(psu = xhpsu, hhld = xhnum, outerwall = v02_04, foundation = v02_05, roofing = v02_06, 
+  dplyr::select(psu = xhpsu, hhld = xhnum, outerwall = v02_04, foundation = v02_05, roofing = v02_06, 
          ownership = v02_11, drinking_source = v02_19, toilet = v02_26, electric_source = v02_27, 
          fuel_source = v02_33)
 
@@ -19,31 +19,68 @@ str(dep_old)
 dep_old_f <- to_factor(dep_old, levels = "labels")
 str(dep_old_f)
 
+# arrange the factor levels, in higher = better order
+arranged_dep_ini <-
+  as_tibble(lapply(dep_old_f[-c(1, 2)], function(x)
+    factor(x, levels = rev(levels(
+      x
+    ))))) %>%
+  dplyr::mutate(
+    roofing = factor(
+      roofing,
+      levels = c(
+        "Other",
+        "Earth/mud",
+        "Straw/thatch",
+        "Wood/planks",
+        "Galvanized iron",
+        "Tiles/slate",
+        "Concrete/cement"
+      )
+    ),
+    fuel_source = factor(
+      fuel_source,
+      levels = c(
+        "Other",
+        "Kerosene",
+        "Leaves/rubbish/straw/thatch",
+        "Dung",
+        "Firewood",
+        "Bio-gas",
+        "Cylinder gas"
+      )
+    )
+  )
+arranged_dep_ini_num <- as_tibble(lapply(arranged_dep_ini, as.numeric))
+
 # Cronbach's alpha initial ----
-alpha_hqi <- dep_old[-c(1, 2)]
+alpha_hqi <- arranged_dep_ini_num
 psych::alpha(alpha_hqi, check.keys = T)
 
 # reversing the levels of negatively related factors ----
-dep_old_rev <- dep_old_f %>%
+arranged_dep <- arranged_dep_ini %>%
   mutate(
-    roofing = factor(roofing, levels = rev(levels(roofing))),
     ownership = factor(ownership, levels = rev(levels(ownership))),
-    fuel_source = factor(fuel_source, levels = rev(levels(fuel_source)))
   )
 
-# converting to numberic value ----
-dep_old_rev_num <- as_tibble(lapply(dep_old_rev, as.numeric))
+# converting to numeric value ----
+arranged_dep_num <- as_tibble(lapply(arranged_dep, as.numeric))
 
 # Cronbach's alpha final ----
-alpha_hqi_rev <- dep_old_rev_num[-c(1, 2)]
+alpha_hqi_rev <- arranged_dep_num
 psych::alpha(alpha_hqi_rev, check.keys = T)
 
 # principal component analysis ----
 pca <- prcomp(alpha_hqi_rev, center = TRUE, scale. = TRUE)
 summary(pca)
 
+pca2 <- pca(alpha_hqi_rev, nfactors = 2, rotate = "varimax")
+summary(pca2)
+pca2
+print(loadings(pca2), cutoff = 0.5)
+
 # biplot ----
-ggbiplot(
+bi <- ggbiplot(
   pca,
   obs.scale = 1,
   circle = TRUE,
@@ -52,11 +89,14 @@ ggbiplot(
 )
 
 # screeplot ----
-screeplot(pca, type = "line", main = "Scree Plot for PCA")
+sc <- screeplot(pca, type = "line", main = "Scree Plot for PCA")
 
 # factor analysis ----
-fa(alpha_hqi_rev,
+fa <- fa(alpha_hqi_rev,
    nfactors = 2,
    rotate = "varimax",
    fm = "minres")
 
+# save dependent vars data ----
+saveRDS(arranged_dep, file = "./data/old/processed/dep_old_vars.RDS")
+saveRDS(arranged_dep_num, file = "./data/old/processed/dep_old.RDS")
