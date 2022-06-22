@@ -108,7 +108,14 @@ fa <- fa(alpha_hqi_rev,
    rotate = "varimax",
    fm = "minres")
 
+# calculate the HQI and add region before saving ----
+hqi <- arranged_dep_num %>%
+  bind_cols(., dep_old_f[ncol(dep_old_f)]) %>% 
+  mutate(HQI = rowSums(.[1:8]))
+
+hqi_vars <- arranged_dep %>% 
+  bind_cols(., hqi[tail(names(hqi), 2)])
 
 # save dependent vars data ----
-saveRDS(bind_cols(arranged_dep, dep_old_f[ncol(dep_old_f)]), file = "./data/old/processed/dep_old_vars.RDS")
-saveRDS(bind_cols(arranged_dep_num, dep_old_f[ncol(dep_old_f)]), file = "./data/old/processed/dep_old.RDS")
+saveRDS(hqi_vars, file = "./data/old/processed/dep_old_vars.RDS")
+saveRDS(hqi, file = "./data/old/processed/dep_old.RDS")
