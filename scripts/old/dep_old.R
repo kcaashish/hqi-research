@@ -15,13 +15,24 @@ dep_old <- os02 %>%
 
 str(dep_old)
 
-# convert haven_labelled data to factor ----
-dep_old_f <- to_factor(dep_old, levels = "labels")
+# convert haven_labelled data to factor and add region ----
+dep_old_f <- to_factor(dep_old, levels = "labels") %>% 
+  left_join(.,
+            os00 %>% 
+              dplyr::mutate(
+                region = case_when(
+                  xstra == 100 ~ 1,
+                  xstra %in% c(218, 219, 221, 222, 223, 224, 225) ~ 2,
+                  xstra %in% c(310, 321, 322, 323, 324, 325) ~ 3
+                )) %>% 
+              dplyr::mutate(region = factor(region, labels = c("Himalaya", "Hill", "Terai"))) %>% 
+              select(psu = xhpsu, hhld = xhnum, region),
+            by = c("psu", "hhld"))
 str(dep_old_f)
 
 # arrange the factor levels, in higher = better order
 arranged_dep_ini <-
-  as_tibble(lapply(dep_old_f[-c(1, 2)], function(x)
+  as_tibble(lapply(dep_old_f[-c(1, 2, ncol(dep_old_f))], function(x)
     factor(x, levels = rev(levels(
       x
     ))))) %>%
@@ -97,6 +108,7 @@ fa <- fa(alpha_hqi_rev,
    rotate = "varimax",
    fm = "minres")
 
+
 # save dependent vars data ----
-saveRDS(bind_cols(dep_old_f[c(1, 2)], arranged_dep), file = "./data/old/processed/dep_old_vars.RDS")
-saveRDS(bind_cols(dep_old_f[c(1, 2,)], arranged_dep_num), file = "./data/old/processed/dep_old.RDS")
+saveRDS(bind_cols(arranged_dep, dep_old_f[ncol(dep_old_f)]), file = "./data/old/processed/dep_old_vars.RDS")
+saveRDS(bind_cols(arranged_dep_num, dep_old_f[ncol(dep_old_f)]), file = "./data/old/processed/dep_old.RDS")
