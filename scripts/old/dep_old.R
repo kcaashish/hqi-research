@@ -98,5 +98,5 @@ fa <- fa(alpha_hqi_rev,
    fm = "minres")
 
 # save dependent vars data ----
-saveRDS(arranged_dep, file = "./data/old/processed/dep_old_vars.RDS")
-saveRDS(arranged_dep_num, file = "./data/old/processed/dep_old.RDS")
+saveRDS(bind_cols(dep_old_f[c(1, 2)], arranged_dep), file = "./data/old/processed/dep_old_vars.RDS")
+saveRDS(bind_cols(dep_old_f[c(1, 2,)], arranged_dep_num), file = "./data/old/processed/dep_old.RDS")
