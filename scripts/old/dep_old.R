@@ -112,6 +112,12 @@ fa <- fa(alpha_hqi_rev,
    rotate = "varimax",
    fm = "minres")
 
+# correlation adequacy ----
+cortest.bartlett(cor(alpha_hqi_rev), n = nrow(alpha_hqi_rev))
+
+# sampling adequacy ----
+KMO(alpha_hqi_rev)
+
 # calculate the HQI and add region before saving ----
 hqi <- arranged_dep_num %>%
   bind_cols(., dep_old_f[ncol(dep_old_f)]) %>% 
