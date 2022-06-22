@@ -1,40 +1,8 @@
-library(plotly)
+# source required scripts ----
+source("./scripts/helpers.R")
 
 # read the processed data ----
 hqi <- readRDS("./data/processed/dependent_vars.RDS")
-
-# function to create Pie charts ----
-make_pie_chart <- function(variable, name, filename) {
-  pie_df <- as.data.frame(table(variable))
-  figure <-
-    plot_ly(
-      pie_df,
-      labels = ~ variable,
-      values = ~ Freq,
-      type = "pie"
-    ) %>%
-    layout(
-      title = list(
-        text = paste0('<b>', name, '</b>'),
-        x = 0.5,
-        y = 0.98
-      ),
-      xaxis = list(
-        showgrid = FALSE,
-        zeroline = FALSE,
-        showticklabels = FALSE
-      ),
-      yaxis = list(
-        showgrid = FALSE,
-        zeroline = FALSE,
-        showticklabels = FALSE
-      ),
-      legend = list(title = list(text = paste0(
-        '<b>', name, '</b>'
-      )))
-    )
-  return(figure)
-}
 
 # create pie charts ----
 fig1 <- make_pie_chart(hqi$house_own, "Types of house ownership")
