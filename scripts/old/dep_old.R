@@ -28,6 +28,10 @@ dep_old_f <- to_factor(dep_old, levels = "labels") %>%
               dplyr::mutate(region = factor(region, labels = c("Himalaya", "Hill", "Terai"))) %>% 
               select(psu = xhpsu, hhld = xhnum, region),
             by = c("psu", "hhld"))
+
+# changing "No outside walls" to "Other material" for outerwall ----
+dep_old_f[which(dep_old_f$outerwall == "No outside walls"), ]$outerwall <- "Other material"
+dep_old_f$outerwall <- droplevels(dep_old_f$outerwall)
 str(dep_old_f)
 
 # arrange the factor levels, in higher = better order
