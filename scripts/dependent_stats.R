@@ -3,6 +3,7 @@ library(data.table)
 
 # source in the required scripts ----
 source("./scripts/dependent.R")
+source("./scripts/helpers.R")
 
 # national level stats ----
 print("The national level stats:")
@@ -25,22 +26,6 @@ hqi_for_sum <- dep_num_rev %>%
   ) %>%
   mutate(region = factor(region, labels = c("Himalaya", "Hill", "Terai"))) %>%
   mutate(quintile = ntile(HQI, 5))
-
-
-# calculate required summary statistics of variables forming the HQI ----
-get_summary <- function(var) {
-  return(
-    list(
-      "Min." = min(var),
-      "1st Qu." = quantile(var, 0.25),
-      "Median" = median(var),
-      "Mean" = mean(var),
-      "3rd Qu." = quantile(var, 0.75),
-      "Max." = max(var),
-      "Sd." = sd(var)
-    )
-  )
-}
 
 hqiDT <- as.data.table(hqi_for_sum)
 hqiDT[, as.list(get_summary(HQI))]
