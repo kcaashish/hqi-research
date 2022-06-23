@@ -64,6 +64,28 @@ arranged_dep_ini <-
         "Bio-gas",
         "Cylinder gas"
       )
+    ),
+    drinking_source = factor(
+      drinking_source,
+      levels = c(
+        "Other source",
+        "River",
+        "Spring water",       
+        "Open well",     
+        "Covered well",
+        "Hand pump/Tubewell",
+        "Piped water"
+      )
+    ),
+    toilet = factor(
+      toilet,
+      levels = c(
+        "No toilet",  
+        "Flush - municipal sewer",
+        "Non-flush",
+        "Communal latrine",
+        "Flush - septic tank"
+      )
     )
   )
 arranged_dep_ini_num <- as_tibble(lapply(arranged_dep_ini, as.numeric))
