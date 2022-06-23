@@ -1,5 +1,5 @@
 # source required scripts ----
-source("./scripts/helpers.R")
+source("./functions/helpers.R")
 
 # read the processed data ----
 hqi <- readRDS("./data/processed/dependent_vars.RDS")

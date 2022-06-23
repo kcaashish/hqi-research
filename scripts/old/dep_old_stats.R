@@ -3,7 +3,7 @@ library(plyr)
 library(data.table)
 
 # source the required scripts ----
-source("./scripts/helpers.R")
+source("./functions/helpers.R")
 
 # import the required data for statistics ----
 dependent <- readRDS("./data/old/processed/dep_old.RDS")

@@ -3,7 +3,7 @@ library(data.table)
 
 # source in the required scripts ----
 source("./scripts/dependent.R")
-source("./scripts/helpers.R")
+source("./functions/helpers.R")
 
 # national level stats ----
 print("The national level stats:")

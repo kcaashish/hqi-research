@@ -4,7 +4,7 @@ library(tidyr)
 options(scipen = 999)
 
 # source the required scripts / RDS files
-source("./scripts/stats_helpers.R")
+source("./helpers/stats_helpers.R")
 independent <- readRDS("./data/old/processed/independent.RDS")
 
 # separate marital status into 5 different variables ----
