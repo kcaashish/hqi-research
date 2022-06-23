@@ -32,3 +32,44 @@ ind_old <- os01 %>%
               dplyr::mutate(region = factor(region, labels = c("Himalaya", "Hill", "Terai"))) %>% 
               select(psu = xhpsu, hhld = xhnum, agriculture_land = v13_02, region),
             by = c("psu", "hhld"))
+
+
+# check for NA values ----
+ind_old %>% 
+  dplyr::summarise(across(everything(), ~ sum(is.na(.))))
+
+# removing variable with high number NA values ----
+ind_old <- ind_old %>% 
+  dplyr::select(!c(technical_vocational))
+
+# creating dummy variables ----
+clean_ind_old <- ind_old %>% 
+  mutate(
+    # male - 1, else - 0
+    sex = if_else(sex == 1, 1, 0),
+    # brahmin (hill), brahmin (terai) - 1, else - 0
+    caste = if_else(caste %in% c(2, 27), 1, 0),
+    # yes - 1, else - 0
+    can_read = if_else(can_read == 1, 1, 0),
+    # yes - 1, else - 0
+    can_write = if_else(can_write == 1, 1, 0),
+    # Never attended school - 0, else - 1
+    ever_school = if_else(ever_school == 1, 0, 1),
+    # > SLC - 1, else - 0
+    grade_comp = if_else(as.numeric(grade_comp) >= 11, 1, 0),
+    # yes - 1, else - 0
+    agriculture_land = if_else(agriculture_land == 1, 1, 0)
+  )
+
+# remove rows with NA terms ---- 
+clean_ind_old <-  clean_ind_old %>% 
+  mutate(
+    can_write = if_else(is.na(can_write) & can_read == 0, 0, can_write),
+    grade_comp = if_else(is.na(grade_comp) &
+                           can_read == 0, 0, grade_comp)
+  ) %>%
+  na.omit()
+
+# check for NA values ----
+clean_ind_old %>% 
+  dplyr::summarise(across(everything(), ~ sum(is.na(.))))
