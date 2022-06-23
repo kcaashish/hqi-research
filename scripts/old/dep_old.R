@@ -143,10 +143,11 @@ KMO(alpha_hqi_rev)
 # calculate the HQI and add region before saving ----
 hqi <- arranged_dep_num %>%
   bind_cols(., dep_old_f[ncol(dep_old_f)]) %>% 
-  mutate(HQI = rowSums(.[1:8]))
+  mutate(HQI = rowSums(.[1:8])) %>% 
+  bind_cols(., dep_old_f[c(1, 2)])
 
 hqi_vars <- arranged_dep %>% 
-  bind_cols(., hqi[tail(names(hqi), 2)])
+  bind_cols(., hqi[tail(names(hqi), 4)])
 
 # save dependent vars data ----
 saveRDS(hqi_vars, file = "./data/old/processed/dep_old_vars.RDS")
