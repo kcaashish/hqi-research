@@ -4,7 +4,7 @@ library(tidyr)
 options(scipen = 999)
 
 # source the required scripts / RDS files
-source("./helpers/stats_helpers.R")
+source("./functions/stats_helpers.R")
 independent <- readRDS("./data/old/processed/independent.RDS")
 
 # separate marital status into 5 different variables ----
@@ -21,10 +21,10 @@ ind_fac <- independent %>%
   select(!marital)
 
 # get stats ----
-region_separted_total <- get_region_separated_stats(ind_fac)
-region_included_total <- get_region_included_stats(ind_fac)
+region_separted_total_old <- get_region_separated_stats(ind_fac)
+region_included_total_old <- get_region_included_stats(ind_fac)
 
 # save into csvs ----
-write.csv(region_separted_total, file = "./output/region_separated_old.csv", quote = FALSE)
-write.csv(region_included_total, file = "./output/region_included_old.csv", quote = FALSE)
+write.csv(region_separted_total_old, file = "./output/region_separated_old.csv", quote = FALSE)
+write.csv(region_included_total_old, file = "./output/region_included_old.csv", quote = FALSE)
 
