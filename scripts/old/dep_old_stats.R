@@ -32,4 +32,4 @@ dependent %>%
   dplyr::summarize(Percent = paste0(round(n() / nrow(dependent) * 100, 1), " %"))
 
 # get descriptive stats for dependent variables ----
-out <- lapply(names(dependent_vars)[-c(9,10)], function(x) get_freq(dependent_vars, x))
+out <- lapply(names(dependent_vars)[-c(9:12)], function(x) get_freq(dependent_vars, x))
