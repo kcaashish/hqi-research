@@ -73,3 +73,6 @@ clean_ind_old <-  clean_ind_old %>%
 # check for NA values ----
 clean_ind_old %>% 
   dplyr::summarise(across(everything(), ~ sum(is.na(.))))
+
+# save dataset ----
+saveRDS(clean_ind_old, file = "./data/old/processed/independent.RDS")
