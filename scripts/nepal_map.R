@@ -2,9 +2,11 @@ library(sf)
 library(gridpattern)
 library(ggpattern)
 # install.packages("magick")
+library(patchwork)
 
 # source in required scripts ----
-source("./scripts/dependent_stats.R")
+province_data <- readRDS("./data/processed/province_data.RDS")
+old_province_data <- readRDS("./data/old/processed/old_province_data.RDS")
 
 get_map <- function(df, year) {
   # Read shapefile into a dataframe, then merge provincial hqi data with the df
