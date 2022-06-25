@@ -56,3 +56,6 @@ get_map <- function(df, year) {
   return(map)
 }
 
+plot2018 <- get_map(province_data, "2018")
+plot2010 <- get_map(old_province_data, "2010")
+combined <- plot2010 + plot2018 + plot_layout(guides = "collect") & theme(legend.position = "bottom")
