@@ -51,7 +51,7 @@ hqi_for_sum %>%
 province_data <- province_data %>%
   mutate(
     "HQI Range" = case_when(
-      17 <= Mean & Mean < 30 ~ "17-30",
+      16 <= Mean & Mean < 30 ~ "16-30",
       30 <= Mean & Mean < 33 ~ "30-33",
       33 <= Mean & Mean < 35 ~ "33-35",
       35 <= Mean & Mean < 39 ~ "35-39",
@@ -60,8 +60,9 @@ province_data <- province_data %>%
   ) %>%
   mutate("HQI Range" = factor(
     `HQI Range`,
-    levels = c("17-30", "30-33", "33-35", "35-39", "39-45")
+    levels = c("16-30", "30-33", "33-35", "35-39", "39-45")
   ))
 
 # save hqi_for_sum dataset ----
 saveRDS(hqi_for_sum, file = "./data/processed/hqi_data.RDS")
+saveRDS(province_data, file = "./data/processed/province_data.RDS")
