@@ -3,6 +3,7 @@ library(gridpattern)
 library(ggpattern)
 # install.packages("magick")
 library(patchwork)
+library(ggplot2)
 
 # source in required scripts ----
 province_data <- readRDS("./data/processed/province_data.RDS")
@@ -33,7 +34,7 @@ get_map <- function(df, year) {
       fill = "white",
       color = "black",
       pattern_scale = 1,
-      pattern_key_scale_factor = 1.5
+      pattern_key_scale_factor = 1
     ) +
     geom_sf_label(
       aes(fontface = "bold"),
@@ -58,4 +59,4 @@ get_map <- function(df, year) {
 
 plot2018 <- get_map(province_data, "2018")
 plot2010 <- get_map(old_province_data, "2010")
-combined <- plot2010 + plot2018 + plot_layout(guides = "collect") & theme(legend.position = "bottom")
+combined <- plot2010 / plot2018 + plot_layout(guides = "collect") & theme(legend.position = "right")
